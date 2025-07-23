@@ -1,9 +1,13 @@
+using NLog.Web;
 using RestaurantAPI;
 using RestaurantAPI.Entities;
 using RestaurantAPI.Services;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+// NLog: Setup NLog for Dependency injection
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 // Add services to the container.
 //builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();

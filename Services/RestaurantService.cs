@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAPI.Entities;
+using RestaurantAPI.Exceptions;
 using RestaurantAPI.Models;
 
 namespace RestaurantAPI.Services
@@ -24,7 +25,8 @@ namespace RestaurantAPI.Services
                 .Include(r => r.Address)
                 .Include(r => r.Dishes)
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return null;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
             var result = _mapper.Map<RestaurantDto>(restaurant);
             return result;
         }
@@ -45,28 +47,28 @@ namespace RestaurantAPI.Services
             _dbContex.SaveChanges();
             return restaurant.Id;
         }
-        public bool Delete(int id)
+        public void Delete(int id)
         {
             _logger.LogError($"Restaurant with id: {id} DELETE action invoked");
             var restaurant = _dbContex
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return false;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
             _dbContex.Restaurants.Remove(restaurant);
             _dbContex.SaveChanges();
-            return true;
         }
-        public bool Update(int id, UpdateRestaurantDto dto)
+        public void Update(int id, UpdateRestaurantDto dto)
         {
             var restaurant = _dbContex
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return false;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
             restaurant.Name = dto.Name;
             restaurant.Description = dto.Description;
             restaurant.HasDelivery = dto.HasDelivery;
             _dbContex.SaveChanges();
-            return true;
         }
     }
 }

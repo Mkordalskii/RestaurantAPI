@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using RestaurantAPI;
 using RestaurantAPI.Entities;
@@ -9,6 +10,7 @@ using RestaurantAPI.Models;
 using RestaurantAPI.Models.Validators;
 using RestaurantAPI.Services;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 // NLog: Setup NLog for Dependency injection
@@ -29,17 +31,53 @@ builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
-
-var app = builder.Build();
+builder.Configuration.GetSection("Authentication");
 
 // Configure the HTTP request pipeline.
+var app = builder.Build();
 var scope = app.Services.CreateScope();
 var seeder = scope.ServiceProvider.GetRequiredService<RestaurantSeeder>();
 seeder.Seed();
 
+var authenticationSettings = new AuthenticationSettings();
+
+app.Configuration.GetSection("Authentication").Bind(authenticationSettings);
+
+builder.Services.AddAuthentication(options =>
+
+{
+
+    options.DefaultAuthenticateScheme = "Bearer";
+
+    options.DefaultScheme = "Bearer";
+
+    options.DefaultChallengeScheme = "Bearer";
+
+}).AddJwtBearer(cfg =>
+
+{
+
+    cfg.RequireHttpsMetadata = true;
+
+    cfg.SaveToken = true;
+
+    cfg.TokenValidationParameters = new TokenValidationParameters
+
+    {
+
+        ValidIssuer = authenticationSettings.JwtIssuer,
+
+        ValidAudience = authenticationSettings.JwtIssuer,
+
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey)),
+
+    };
+
+});
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
-
+app.UseAuthentication();
 app.UseHttpsRedirection();
 
 app.UseSwagger();

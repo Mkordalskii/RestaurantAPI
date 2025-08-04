@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.Models;
 using RestaurantAPI.Services;
 
@@ -6,6 +7,7 @@ namespace RestaurantAPI.Controllers
 {
     [Route("api/restaurant")]
     [ApiController] // except if (!ModelState.IsValid) return BadRequest(ModelState);
+    [Authorize]
     public class RestaurantController : ControllerBase
     {
 
@@ -22,6 +24,8 @@ namespace RestaurantAPI.Controllers
             return NoContent();
         }
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public ActionResult CreateRestaurant([FromBody] CreateRestaurantDto dto)
         {
             var id = restaurantService.Create(dto);
@@ -41,6 +45,7 @@ namespace RestaurantAPI.Controllers
             return Ok(restaurant);
         }
         [HttpPut("{id}")]
+        [AllowAnonymous]
         public ActionResult Update([FromBody] UpdateRestaurantDto dto, [FromRoute] int id)
         {
             restaurantService.Update(id, dto);

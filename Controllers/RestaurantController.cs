@@ -32,12 +32,14 @@ namespace RestaurantAPI.Controllers
             return Created($"/api/restaurant/{id}", null);
         }
         [HttpGet]
+        [Authorize(Policy = "HasNationality")]
         public ActionResult<IEnumerable<RestaurantDto>> GetAll()
         {
             var restaurantDtos = restaurantService.GetAll();
             return Ok(restaurantDtos);
         }
         [HttpGet("{id}")]
+        [Authorize(Policy = "Atleast20")]
         public ActionResult<RestaurantDto> Get([FromRoute] int id)
         {
 

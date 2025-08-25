@@ -54,6 +54,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Atleast20", builder => builder.AddRequirements(new MinimumAgeRequirement(20)));
 });
 builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeRequirementHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
 builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddDbContext<RestaurantDbContext>();
 builder.Services.AddScoped<RestaurantSeeder>();

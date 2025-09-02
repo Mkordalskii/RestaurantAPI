@@ -74,11 +74,11 @@ builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator
 builder.Services.AddScoped<IValidator<RestaurantQuery>, RestaurantQueryValidator>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("FrontEndClient", builder =>
-    builder.AllowAnyMethod()
+    options.AddPolicy("FrontEndClient", policyBuilder =>
+    policyBuilder.AllowAnyMethod()
     .AllowAnyHeader()
-    .WithOrigins("http://localhost:7231")
-    );
+    .WithOrigins(builder.Configuration["AllowedOrigins"])
+        );
 
 });
 

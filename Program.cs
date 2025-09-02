@@ -72,6 +72,15 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RestaurantQuery>, RestaurantQueryValidator>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontEndClient", builder =>
+    builder.AllowAnyMethod()
+    .AllowAnyHeader()
+    .WithOrigins("http://localhost:7231")
+    );
+
+});
 
 
 // Krok 3: Budowanie aplikacji - ten krok "zamra¿a" kolekcjê us³ug
@@ -80,6 +89,7 @@ var app = builder.Build();
 // Krok 4: Uruchomienie seeder'a (konfiguracja po builder.Build())
 var scope = app.Services.CreateScope();
 var seeder = scope.ServiceProvider.GetRequiredService<RestaurantSeeder>();
+app.UseCors("FrontEndClient");
 seeder.Seed();
 
 // Krok 5: Konfiguracja potoku ¿¹dañ HTTP (middleware)

@@ -32,7 +32,7 @@ namespace RestaurantAPI.Controllers
             return Created($"/api/restaurant/{id}", null);
         }
         [HttpGet]
-        [Authorize(Policy = "CreatedAtLeast2Restaurants")]
+        //[Authorize(Policy = "CreatedAtLeast2Restaurants")]
         public ActionResult<IEnumerable<RestaurantDto>> GetAll([FromQuery] RestaurantQuery restaurantQuery)
         {
             var restaurantDtos = restaurantService.GetAll(restaurantQuery);

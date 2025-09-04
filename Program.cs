@@ -93,6 +93,7 @@ app.UseCors("FrontEndClient");
 seeder.Seed();
 
 // Krok 5: Konfiguracja potoku ¿¹dañ HTTP (middleware)
+app.UseResponseCaching();
 app.UseStaticFiles();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestTimeMiddleware>();
